@@ -5,9 +5,13 @@ globals.home_folder = hc.File("/root/a0")
 globals.objects = []
 
 
+cinfo = "<#741b47>"
+cauth = "<#E62377FF>"
+cnote = "<#c90076>"
+cutil = "<#3d85c6>"
 
-passwdprompt = user_input("<#E62377FF>Authentication: </color>", true)
-password = "test"
+passwdprompt = user_input(cauth + "Authentication: </color>", true)
+password = "a"
 version = "1.0"
 
 if passwdprompt != password then exit("Authentication failed.")
@@ -34,16 +38,16 @@ print("<#841dea>  / _` | '__| | | |</color>")
 print("<#841dea> | (_| | |  | |_| |</color>")
 print("<#841dea>  \__,_|_|   \___/ </color>")
 print("<#6fa8dc>-------------------------------------<#c90076><b>[Main]</b></color>-------------------------------------</color>")
-print("<#741b47>[Info]> </color><color=white><b>Current version: "+version+"</b></color>")
-print("<#741b47>[Info]> </color><color=white><b>Welcome "+active_user+"</b></color>")
-print("<#741b47>[Info]> </color><color=white><b>Made by ar0/<#fc0cf4>Ren</color></color>")
+print(cinfo +"[Info]> </color><color=white><b>Current version: "+version+"</b></color>")
+print(cinfo +"[Info]> </color><color=white><b>Welcome "+active_user+"</b></color>")
+print(cinfo + "[Info]> </color><color=white><b>Made by ar0/<#fc0cf4>Ren</color></color>")
 
 globals.mx = include_lib("/root/a0/metaxploit.so")
 if not mx then
 	globals.mx = include_lib("/lib/metaxploit.so")
 
 	if not mx then
-		print("<#c90076>[Notification]</color><color=white><b> Couldn't find metaxploit.so in /lib or /root/a0")
+		print(cnote +"[Notification]</color><color=white><b> Couldn't find metaxploit.so in /lib or /root/a0")
 	end if
 end if
 
@@ -51,7 +55,7 @@ globals.crypto = include_lib("/root/a0/crypto.so")
 if not crypto then
 	globals.crypto = include_lib("/lib/crypto.so")
 	if not crypto then
-		print("<#c90076>[Notification]</color><color=white><b> Couldn't find crypto.so in /lib or /root/a0")
+		print(cnote +"[Notification]</color><color=white><b> Couldn't find crypto.so in /lib or /root/a0")
 	end if
 end if
 
@@ -135,7 +139,10 @@ hack = function(ip,port)
 		if typeof(ex) == "shell" then
 			print("Shell found. Use it? Y/N")
 			said = user_input("Answer:")
-			if said == "y" then ex.start_terminal end if
+			if said == "y" then 
+			hs.scp("/root/a0/*, /home/"+active_user+"",ex)
+			ex.start_terminal
+			ex.launch("a0") 
 		end if
 		
 		
@@ -828,8 +835,7 @@ menu = function()
 sys_msg
 	
 	usr_shell = function()
-	
-	message = user_input("\n<#3d85c6>{<#3d85c6>------[C»</color><color=red>"+active_user+"</color>]------[<#f1c232>Public@"+hc.public_ip+"</color>--<#f1c232>Local@"+hc.local_ip+"</color>]------------}: </color>")
+	message = user_input("\n<#3d85c6>{<#3d85c6>------[ar0»</color><color=red>"+active_user+"</color>]------[<#f1c232>Public@"+hc.public_ip+"</color>--<#f1c232>Local@"+hc.local_ip+"</color>]------------}: </color>")
 	args = message.split(" ")
 	
 	
