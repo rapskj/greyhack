@@ -105,24 +105,18 @@ fwddisable = function(ip)
 end function
 
 hack = function(ip,port)
-	password = "hi"
+	
 	r=get_router(ip)
-	vulnMap = {}
 	
-	net_session = mx.net_use(ip,port)
-	metalib = net_session.dump_lib
-	addrs = mx.scan(metalib)
+	netsess = mx.net_use(ip,port)
 	
+	lib = netsess.dump_lib
+	addrs = mx.scan(lib)
+	pass = "hi"
 	
 	exhandler = function(addr,unsec)
+		ex = lib.overflow(addr,unsec, pass)
 		
-		ex = metalib.overflow(addr,unsec,password)
-
-
-		objects.push(ex)
-
-		
-
 		if typeof(ex) == "computer" then
 
 			pwd = ex.File("/etc/passwd")
@@ -130,15 +124,16 @@ hack = function(ip,port)
 				if pwd.has_permission("r") then
 					print(pwd.get_content)
 				else
-					print("<color=red>no perm permission to read /etc/passwd</color>")
+					print("<color=red>No perms</color>")
 				end if
 			else
-				print("<color=red>The password file seems to have been deleted...</color>")
+				print("<color=red>Deleted file</color>")
 			end if
 			
 		end if
 		
 		if typeof(ex) == "shell" then
+			print("Shell found. Use it? Y/N")
 			said = user_input("Answer:")
 			if said == "y" then ex.start_terminal end if
 		end if
@@ -146,15 +141,17 @@ hack = function(ip,port)
 		
 		
 	end function
-
-
+	
 	
 	for addr in addrs
 		
-		info = mx.scan_address(metalib,addr)
+		info = mx.scan_address(lib,addr)
 		info = info.remove("decompiling source...").remove("searching unsecure values...")
 		info = info[2:]
 		
+		while info.indexOf("Unsafe check: ") != null or info.indexOf("<b>") != null or info.indexOf("</b>") != null
+			info = info.remove("Unsafe check: ").remove("<b>").remove("</b>")
+		end while
 		
 		while info.indexOf("loop in array ") != null
 			info = info.replace("loop in array ", "<tag>")
@@ -170,14 +167,13 @@ hack = function(ip,port)
 			str = info[:info.indexOf(".")]
 			exhandler(addr,str)
 		end while
-
 		
 		//print(info)
 		
 	end for
 	
 	
-end function //end hack
+end function
 
 
 ls = function()
@@ -923,28 +919,37 @@ sys_msg
 			
 		end if
 
+		if args[0] == "fwdd" then
+		fwddisable(target_router.public_ip)
+	end if
+
+
 		if args[0] == "hash" then
 			hash = args[1]
+			lineCont = line.split(":")
 			print("\n<#fc0cf4>Cracking hash</color>\n")
 			decrypt = crypto.decipher(hash)
 			print("\n<#fc0cf4>Password: </color><color=white><color=white>"+decrypt+"</color>")
 		end if
 
 
+
 	if args[0] == "exit" then
 		exit
 	end if
 
-	if args[0] == "fwdd" then
-		fwddisable(target_router.public_ip)
-	end if
-
+	
 
 
 	if args[0] == "ls" then
 	ls
 
 end if
+
+	if args[0] == "cl" then
+		clear_screen
+	end if
+
 
 		if args[0] == "ps" then
 			output = hc.show_procs
@@ -1013,28 +1018,6 @@ end if
 
 		end if
 
-		if args[0] == "secure" then
-			if not active_user == "root" then
-				print("<color=red><b>No root.</b></color>")
-			end if
-
-			computer = get_shell.host_computer
-			file = computer.File("/sys/def")
-			if file then
-				print("<color=red><b>Def exists.</b></color>")
-			end if
-			computer.touch("/sys","def")
-		     get_shell.host_computer.File("/").chmod("o-wrx",1)
-		     get_shell.host_computer.File("/").chmod("u-wr",1)
-		     get_shell.host_computer.File("/").chmod("g-wr",1)
-		
-		     pwd = get_shell.host_computer.File("/etc/passwd")
-		    if not pwd == null then
-			 pwd.delete()	
-		    end if
-		
-		print("<color=green>Machine secured</color>")
-		end if
 
 
 
