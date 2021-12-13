@@ -1,0 +1,173 @@
+pink="<color=#FF00CD>"
+orange="<color=#FF9225>"
+blue="<color=#2581FF>"
+error="<color=#878787>"
+white="<color=white>"
+red="<color=red>"
+yellow="<color=#D4AF37FF>"
+b="<b>"
+
+u="<u>"
+b2="</b>"
+u2="</u>"
+Toggle={}
+
+Toggle.done=false
+LanList=[]
+n=function()
+  a=floor((rnd * 255) + 1)
+  return a
+end function
+remove_repeats = function(file)
+	if not file or file.get_content == "" then
+	else
+		lines = file.get_content.split(char(10))
+		lines_no_repeats = []
+		for line in lines
+			if line == "" then continue
+			if lines_no_repeats.indexOf(line) == null then lines_no_repeats.push(line)
+		end for
+		file.set_content(lines_no_repeats.join(char(10))+char(10))
+	end if
+end function
+
+objects={}
+objects.targetFile=[]
+objects.navFile=function(file, target=false)
+	if typeof(file) != "file" then exit(red+b+"***objects.navFile(): [file] param is not file***")
+	if target == false then exit(red+b+"***objects.navFile(): [target] target is false aka [not defined]***")
+	if file.path==target then
+		objects.targetFile.push(file)//helps with if gile and target are both '/' and so on
+		return
+	end if
+	list=[]
+	l=file.get_files+file.get_folders
+	for f in l
+		if target==f.path then
+			objects.targetFile.push(f)
+			break
+		end if
+		if f.is_folder then
+			objects.navFile(f, target)
+		end if
+	end for
+end function
+
+banker=get_shell.host_computer.File("/home/guest/bankgrab.txt")
+if not banker then get_shell.host_computer.touch("/home/guest", "bankgrab.txt")
+banker=get_shell.host_computer.File("/home/guest/bankgrab.txt")
+
+metax=include_lib(current_path+"/AllTrue/metaxploit.so")
+if not metax then exit("")
+
+while true
+  if not banker then exit("<color=#878787>'/home/guest/bankgrab.txt' is missing...")
+  ip=[n,n,n,n].join(".")
+  if not is_valid_ip(ip) then continue
+  if not get_router(ip) then continue
+  if get_router(ip).used_ports.len == 0 then continue
+  ports=get_router(ip).used_ports
+  remove_repeats(banker)
+  for p in ports
+    if p.is_closed then continue
+    net=metax.net_use(ip, p.port_number)
+    if not net then continue
+    Lib=net.dump_lib
+  	print(b+orange+get_shell.host_computer.public_ip+error+"-->"+red+ip+orange+": ")
+  	print(blue+"Scanning Target: "+b+orange+Lib.lib_name+" "+orange+Lib.version+char(10))
+    LAN=p.get_lan_ip
+    LanList.push(LAN)
+    if Toggle.done == true and LAN==LanList[-1] then
+      Toggle.done=false
+      continue
+    end if
+
+  	Memories = metax.scan(Lib)
+
+  	for memory in Memories
+    if Toggle.done == true then
+      Toggle.done=false
+      break
+    end if
+  		results = metax.scan_address(Lib, memory)
+  		List = []
+  		line = results.split(" ")
+  		for word in line
+  			new_word = word.values
+  			if word != "overflow." and word != "source..." and word != "user." and word.len > 2 then
+  				if new_word[-1] == "." then
+  					word = word.remove(".")
+  					word = word.remove("<b>")
+  					word = word.remove("</b>")
+  					List.push(word)
+  				end if
+  			end if
+  		end for
+
+  		for payload in List
+  			result = Lib.overflow(memory, payload, "1234")
+        if typeof(result) == "null" then continue
+        if typeof(result) == "number" then continue
+        print(red+ip+": "+char(10))
+
+        if typeof(result) == "file" then continue
+        if typeof(result) == "computer" then
+          res=result
+          main=res
+          home=main.File("/home")
+          root=main.File("/root")
+          Users=[]
+          info=[]
+          if home then Users=home.get_folders
+          if Users == [] then continue
+
+          for user in Users
+            file=res.File("/home/"+user.name+"/Config/Bank.txt")
+            if not file or file == null then continue
+            if not file.has_permission("r") then continue
+            info.push(file)
+          end for
+          if info == [] then continue
+
+          for file in info
+            content=file.get_content
+            if content == "can't open /. Binary file." then continue
+            banker.set_content(banker.get_content+content+char(10))
+            Toggle.done=true
+            print(white+"INFO GRABBED!")
+          end for
+          break
+        end if
+
+        if typeof(result) == "shell" then
+          res=result
+          main=res.host_computer
+          home=main.File("/home")
+          root=main.File("/root")
+          Users=[]
+          info=[]
+          if home then Users=home.get_folders
+          if Users == [] then continue
+
+          for user in Users
+            file=main.File("/home/"+user.name+"/Config/Bank.txt")
+            if not file or file == null then continue
+            if not file.has_permission("r") then continue
+            info.push(file)
+          end for
+          if info == [] then continue
+
+          for file in info
+            content=file.get_content
+            if content == "can't open /. Binary file." then continue
+            banker.set_content(banker.get_content+content+char(10))
+            Toggle.done=true
+            print(white+"INFO GRABBED!")
+          end for
+          break
+        end if
+
+      end for
+      end for
+  end for
+end while
