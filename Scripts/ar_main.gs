@@ -190,7 +190,7 @@ Commands["search"]["Run"] = function(args,pipe)
 		return Print(format_columns(output))
 	end if
 end function
-
+//good so far
 Commands["find"] = {"Name": "find","Description": "Finds a file or directory.","Args": "[(opt) name]","Shell":false}
 Commands["find"]["Run"] = function(args,pipe)
 	if args.len == 0 and pipe then args.push(pipe)
@@ -271,7 +271,7 @@ Commands["db"]["Run"] = function(args,pipe)
 	securesys(sh.host_computer)
 	return getShell(sh)
 end function
-
+//still good
 Commands["cd"] = {"Name": "cd","Description": "Moves to a different directory.","Args": "[path]","Shell":false}
 Commands["cd"]["Run"] = function(args,pipe)
 	computer = globals.comp
@@ -644,7 +644,7 @@ Commands["back"]["Run"] = function(args,pipe)
 	end if
 	if sus == "root" then globals.path = "/root"
 end function
-
+//still good
 Commands["install"] = {"Name": "install","Description": "Uploads the script and libraries to the connected server.","Args": "","Shell":true}
 Commands["install"]["Run"] = function(args,pipe)
 	dirs = findUnlockedDirs(globals.comp.File("/"),[])
@@ -940,7 +940,7 @@ Commands["crack"]["Run"] = function(Args,pipe)
 	end for
 	return Print(out)
 end function
-
+//still ok
 Commands["sniff"] = {"Name": "sniff","Description": "The terminal listens to the network packets of any connection that passes through this device.","Args": "[(opt) saveEncSource]","Shell":false}
 Commands["sniff"]["Run"] = function(params,pipe)
 
@@ -1160,7 +1160,7 @@ Commands["scanlan"]["Run"] = function(args,pipe)
 	scanRout(mRouter.local_ip)
 
 end function
-
+//still ok
 Commands["router"] = {"Name": "router","Description": "Scans the router for firewall rules.","Args": "[ip]","Shell":false}
 Commands["router"]["Run"] = function(params,pipe)
 	ipAddress = params[0]
@@ -1339,64 +1339,6 @@ Commands["manual"]["Run"] = function(args,pipe)
 			end if
 		end while
 	end while
-end function
-
-Commands["scan"] = {"Name": "scan","Description": "Scans an ip/domain for vulns.","Args": "[ip/domain] [(opt) port] [(opt) local ip]","Shell":false}
-Commands["scan"]["Run"] = function(args,pipe)
-	ip = args[0]
-	port = null
-	ipAddr = null
-	localIp = null
-
-	globals.H = []
-
-	if not is_valid_ip(ip) then
-		if is_valid_ip(nslookup(ip)) then
-			ip = nslookup(ip)
-		else
-			return error("IP not found!")
-		end if
-	end if
-	ipAddr = ip
-
-	if args.len >= then port = args[1]
-	if args.len == 3 then localIp = args[2]
-	
-	metaxploit = loadMetaXPloit()
-
-	if is_lan_ip(ipAddr) then
-		routerLib = metaxploit.net_use(globals.rout.public_ip)
-		metaLibs = extractMetaLibs(ipAddr)
-	else
-		router = getRouter(ipAddr)
-		routerLib = metaxploit.net_use(router.public_ip)
-		metaLibs = extractMetaLibs(router)
-	end if
-
-	for metaLib in metaLibs
-		if port then
-			if str(metaLib.port_number) != str(port) then continue
-		end if
-
-		if loadExploits(metaLib.metaLib).len == 0 then
-			scanTarget(metaLib.metaLib)
-		end if
-		exploits = loadExploits(metaLib.metaLib)
-		
-		localIp = metaLibs.local_ip
-		if args.len == 3 then localIp = args[2]
-		metaLibs.local_ip = localIp
-
-		exps = []
-		for exploit in exploits
-			exploitObj = runExploit(exploit, metaLib.metaLib, localIp)
-			exps.push(exploitObj)
-		end for
-
-		globals.H.push({"exploits":exps,"metaLib":metaLib})
-	end for
-
-	return Print("Done Scanning! Run: 'exploits' for the found vulns")
 end function
 
 Commands["exploits"] = {"Name": "exploits","Description": "Lists all found vulns.","Args": "","Shell":false}

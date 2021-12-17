@@ -67,29 +67,29 @@ dbConf
 emailConf
 ipConf
 
-globals.ninit = ""
-globals.nmain = ""
-globals.nlib1 = ""
+globals.arinit = ""
+globals.armain = ""
+globals.arlib = ""
 
 compConf = function()
     title
     comp = get_shell.host_computer
     print("[Compiling] (Enter File Path)")
 
-    globals.ninit = user_input("Enter exact path to ninit: ")
-    if not comp.File(globals.ninit) then
+    globals.arinit = user_input("Enter exact path to arinit: ")
+    if not comp.File(globals.arinit) then
         print("Error: file not found")
         return compConf
     end if
 
-    globals.nmain = user_input("Enter exact path to nmain: ")
-    if not comp.File(globals.nmain) then
+    globals.armain = user_input("Enter exact path to armain: ")
+    if not comp.File(globals.armain) then
         print("Error: file not found")
         return compConf
     end if
 
-    globals.nlib1 = user_input("Enter exact path to nlib1: ")
-    if not comp.File(globals.nlib1) then
+    globals.arlib = user_input("Enter exact path to arlib: ")
+    if not comp.File(globals.arlib) then
         print("Error: file not found")
         return compConf
     end if
@@ -123,9 +123,9 @@ temp = comp.File("/etc/"+fname+".temp")
 pt1 = "globals.ipProtect="""+ipProtect+""";"
 pt2 = "globals.server={""db"":"""+server.db+""",""pass"":"""+server.pass+"""};"
 pt3 = "globals.email={""user"":"""+email.user+""",""password"":"""+email.password+"""};"
-pt4 = "i"+"mport_code("""+ninit+""");"
-pt5 = "i"+"mport_code("""+nlib1+""");"
-pt6 = "i"+"mport_code("""+nmain+""");"
+pt4 = "i"+"mport_code("""+arinit+""");"
+pt5 = "i"+"mport_code("""+arlib+""");"
+pt6 = "i"+"mport_code("""+armain+""");"
 
 temp.set_content(pt1+pt2+pt3+pt4+pt5+pt6)
 
