@@ -74,7 +74,7 @@ end function
 authentication = function()
 	clear_screen
 
-	Print("\n"+t.o+"[Noir Authentication "+noir_version+"]"+C.e)
+	Print("\n"+t.o+"[NamelessOS Authentication "+namelessos_version+"]"+C.e)
 	inputPass = user_input(t.o+"Enter Login Code: "+C.e)
 
 	if inputPass != globals.auth.pass then exit("Access Denied!")
@@ -124,7 +124,7 @@ end function
 
 authentication
 
-Print(t.o+"Noir Loaded!\n\n"+C.e)
+Print(t.o+"NamelessOS Loaded!\n\n"+C.e)
 
 clear_screen
 if globals.config.deleteLogs == true then
@@ -395,9 +395,9 @@ Commands["clear"]["Run"] = function(args,pipe)
 	return clear_screen
 end function
 
-Commands["exit"] = {"Name": "exit","Description": "Exits from Noir.","Args": "","Shell":false}
+Commands["exit"] = {"Name": "exit","Description": "Exits from NamelessOS.","Args": "","Shell":false}
 Commands["exit"]["Run"] = function(args,pipe)
-	return exit("Exiting Noir...")
+	return exit("Exiting NamelessOS...")
 end function
 
 Commands["escalate"] = {"Name": "escalate","Description": "Escalates your shell permissions.","Args": "[(opt) local ip]","Shell":false}
@@ -1796,7 +1796,7 @@ Commands["manual"]["Run"] = function(args,pipe)
 	end while
 end function
 
-Commands["scan"] = {"Name": "scan","Description": "(Currently not working)Scans an ip/domain for vulns.","Args": "[ip/domain] [(opt) port] [(opt) local ip]","Shell":false}
+Commands["scan"] = {"Name": "scan","Description": "Scans an ip/domain for vulns.","Args": "[ip/domain] [(opt) port] [(opt) local ip]","Shell":false}
 Commands["scan"]["Run"] = function(args,pipe)
 	ip = args[0]
 	port = null
@@ -2148,7 +2148,7 @@ clear_screen
 
 menu = function()
 	
-	noir = function()
+	namelessos = function()
 		globals.disable_print = false
 		ip = comp.public_ip
 		if ip == ipProtect then ip = "hidden"
@@ -2158,9 +2158,9 @@ menu = function()
 
 		parseCmd(input)
 
-		noir
+		namelessos
 	end function
-	noir
+	namelessos
 	
 	menu
 end function
