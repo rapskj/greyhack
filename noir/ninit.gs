@@ -1,4 +1,4 @@
-noir_version = "v0.2.8097a"
+noir_version = "v0.2.8126a"
 
 theme = "parrot"
 
